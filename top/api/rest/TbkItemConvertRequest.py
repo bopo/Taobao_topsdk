@@ -11,7 +11,8 @@ taobao.tbk.item.convert (淘宝客商品链接转换)
 要申请权限才能调用
 """
 
-from top.api.base import RestApi
+from ..base import RestApi
+
 
 class TbkItemConvertRequest(RestApi):
     def __init__(self, domain='gw.api.taobao.com', port=80):

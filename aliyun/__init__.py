@@ -4,7 +4,7 @@ Created on 2012-6-29
 
 @author: lijie.ma
 '''
-from aliyun.api.base import sign
+from .api.base import sign
 
 
 

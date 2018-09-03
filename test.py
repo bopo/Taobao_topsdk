@@ -5,14 +5,14 @@ Created on 2012-7-3
 @author: lihao
 '''
 import top.api
-
+import json
 
 '''
 这边可以设置一个默认的appkey和secret，当然也可以不设置
 注意：默认的只需要设置一次就可以了
 
 '''
-top.setDefaultAppInfo("122257***", "*******")
+top.setDefaultAppInfo("12061046", "8b0aeb0da683f8ca8a9c602ecd35d0d4")
 
 '''
 使用自定义的域名和端口（测试沙箱环境使用）
@@ -25,19 +25,12 @@ a = top.api.UserGetRequest("gw.api.tbsandbox.com")
 a = top.api.UserGetRequest()
 
 '''
-a = top.api.UserGetRequest()
-
-
-'''
-可以在运行期替换掉默认的appkey和secret的设置
-a.set_app_info(top.appinfo("appkey","*******"))
-'''
-
-a.fields="nick"
+req = top.api.TbkItemGetRequest()
+req.fields = "title,nick,price"
+req.q = "女装"
 
 try:
-    f= a.getResponse()
-    print(f)
+	resp= req.getResponse()
+	print(json.dumps(resp, indent=4))
 except Exception as e:
-    print(e)
-    
+	raise e

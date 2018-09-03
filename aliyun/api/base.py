@@ -5,20 +5,23 @@ Created on 2012-7-3
 @author: lijie.ma
 '''
 
-try: import httplib
+try: 
+    import httplib
 except ImportError:
     import http.client as httplib
-import sys
-import urllib
-import time
-import json
-import aliyun
-import itertools
-import mimetypes
 import base64
 import hmac
+import itertools
+import json
+import mimetypes
+import sys
+import time
+import urllib
 import uuid
 from hashlib import sha1
+
+import aliyun
+
 
 def sign(accessKeySecret, parameters):
     #===========================================================================

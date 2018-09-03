@@ -1,7 +1,7 @@
 '''
 Created by auto_sdk on 2018.04.09
 '''
-from top.api.base import RestApi
+from ..base import RestApi
 
 
 class TbkScNewuserOrderGetRequest(RestApi):

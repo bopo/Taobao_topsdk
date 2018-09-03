@@ -5,16 +5,19 @@ Created on 2012-7-3
 @author: lihao
 '''
 
-try: import httplib
+try: 
+    import httplib
 except ImportError:
     import http.client as httplib
-import urllib
-import time
+
 import hashlib
-import json
-import top
 import itertools
+import json
 import mimetypes
+import time
+import urllib
+
+import top
 
 '''
 定义一些系统变量
@@ -159,6 +162,7 @@ class TopException(Exception):
             " submsg=" + mixStr(self.submsg) +\
             " application_host=" + mixStr(self.application_host) +\
             " service_host=" + mixStr(self.service_host)
+        
         return sb
        
 class RequestException(Exception):
@@ -181,6 +185,7 @@ class RestApi(object):
         self.__domain = domain
         self.__port = port
         self.__httpmethod = "POST"
+
         if(top.getDefaultAppInfo()):
             self.__app_key = top.getDefaultAppInfo().appkey
             self.__secret = top.getDefaultAppInfo().secret
@@ -227,8 +232,10 @@ class RestApi(object):
             P_PARTNER_ID: SYSTEM_GENERATE_VERSION,
             P_API: self.getapiname(),
         }
+
         if authrize is not None:
             sys_parameters[P_SESSION] = authrize
+        
         application_parameter = self.getApplicationParameters()
         sign_parameter = sys_parameters.copy()
         sign_parameter.update(application_parameter)
@@ -236,14 +243,19 @@ class RestApi(object):
         connection.connect()
         
         header = self.get_request_header()
+        
         if(self.getMultipartParas()):
             form = MultiPartForm()
+        
             for key, value in application_parameter.items():
                 form.add_field(key, value)
+        
             for key in self.getMultipartParas():
                 fileitem = getattr(self,key)
+        
                 if(fileitem and isinstance(fileitem,FileItem)):
                     form.add_file(key,fileitem.filename,fileitem.content)
+        
             body = str(form)
             header['Content-type'] = form.get_content_type()
         else:
@@ -252,44 +264,57 @@ class RestApi(object):
         url = N_REST + "?" + urllib.parse.urlencode(sys_parameters)
         connection.request(self.__httpmethod, url, body=body, headers=header)
         response = connection.getresponse()
+        
         if response.status is not 200:
             raise RequestException('invalid http status ' + str(response.status) + ',detail body:' + response.read())
+        
         result = response.read()
         jsonobj = json.loads(result)
+        
         # if jsonobj.has_key("error_response"):
         if "error_response" in jsonobj:
             error = TopException()
+        
             # if jsonobj["error_response"].has_key(P_CODE) :
             if P_CODE in jsonobj["error_response"]:
                 error.errorcode = jsonobj["error_response"][P_CODE]
+        
             # if jsonobj["error_response"].has_key(P_MSG) :
             if P_MSG in jsonobj["error_response"]:
                 error.message = jsonobj["error_response"][P_MSG]
+        
             # if jsonobj["error_response"].has_key(P_SUB_CODE) :
             if P_SUB_CODE in jsonobj["error_response"]:
                 error.subcode = jsonobj["error_response"][P_SUB_CODE]
+        
             # if jsonobj["error_response"].has_key(P_SUB_MSG) :
             if P_SUB_MSG in jsonobj["error_response"]:
                 error.submsg = jsonobj["error_response"][P_SUB_MSG]
 
             error.application_host = response.getheader("Application-Host", "")
             error.service_host = response.getheader("Location-Host", "")
+        
             raise error
+        
         return jsonobj
     
     
     def getApplicationParameters(self):
         application_parameter = {}
+        
         for key, value in self.__dict__.items():
             if not key.startswith("__") and not key in self.getMultipartParas() and not key.startswith("_RestApi__") and value is not None :
                 if(key.startswith("_")):
                     application_parameter[key[1:]] = value
                 else:
                     application_parameter[key] = value
+        
         #查询翻译字典来规避一些关键字属性
         translate_parameter = self.getTranslateParas()
+        
         for key, value in application_parameter.items():
             if key in translate_parameter:
                 application_parameter[translate_parameter[key]] = application_parameter[key]
                 del application_parameter[key]
+        
         return application_parameter

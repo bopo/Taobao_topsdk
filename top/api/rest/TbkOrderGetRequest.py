@@ -16,7 +16,7 @@ http://open.taobao.com/api.htm?docId=24527&docType=2
 
 """
 
-from top.api.base import RestApi
+from ..base import RestApi
 
 
 class TbkOrderGetRequest(RestApi):
